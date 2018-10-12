@@ -1,7 +1,8 @@
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-apply from: '../gradle/gradle-mavenlocal.gradle'
+ apply from: '../gradle/gradle-mavenlocal.gradle'
+ apply from: '../gradle/bintray.gradle'
 
 //def getBintrayUserProperty() {
 //    return hasProperty('BINTRAY_USER') ? BINTRAY_USER : ""
@@ -40,7 +41,7 @@ def bintrayApikey = properties.getProperty("bintray.apikey")
 
 def javadocName = properties.getProperty("javadoc.name")
 
-group = projectGroupId
+group = GROUP
 
 // This generates POM.xml with proper parameters
 
@@ -79,9 +80,9 @@ javadoc {
         encoding "UTF-8"
         charSet 'UTF-8'
         author true
-        version projectVersionName
+        version VERSION_NAME
         links "http://docs.oracle.com/javase/7/docs/api"
-        title javadocName
+        title POM_JAVADOC_TITLE
     }
 }
 
@@ -133,79 +134,3 @@ install {
         }
     }
 }
-
-// bintray.gradle
-
-def getBintrayUser() {
-    return hasProperty('BINTRAY_USER') ? BINTRAY_USER : ""
-}
-
-def getBintrayGPGPassword() {
-    return hasProperty('BINTRAY_GPG_PASSWORD') ? BINTRAY_GPG_PASSWORD : ""
-}
-
-def getBintrayApiKey() {
-    return hasProperty('BINTRAY_API_KEY') ? BINTRAY_API_KEY : ""
-}
-
-def getSonatypeUsername() {
-    return hasProperty('SONATYPE_NEXUS_USERNAME') ? SONATYPE_NEXUS_USERNAME : ""
-}
-
-def getSonatypePassword() {
-    return hasProperty('SONATYPE_NEXUS_PASSWORD') ? SONATYPE_NEXUS_PASSWORD : ""
-}
-
-bintray {
-    user = getBintrayUser()
-    key = getBintrayApiKey()
-
-//    publish = true //[Default: false] Whether version should be auto published after an upload
-//    override = false //[Default: false] Whether to override version artifacts already published
-
-    configurations = ['archives']
-    pkg {
-        repo = "maven"
-        name = POM_NAME
-        desc = POM_DESCRIPTION
-        websiteUrl = POM_URL
-        issueTrackerUrl = POM_ISSUE_URL
-        vcsUrl = POM_SCM_URL
-        licenses = ["Apache-2.0"]
-        publish = true
-        publicDownloadNumbers = true
-
-        githubRepo = POM_URL
-        githubReleaseNotesFile = 'README.md'
-
-        version {
-            gpg {
-                sign = false // Determines whether to GPG sign the files. The default is false
-                passphrase = getBintrayGPGPassword()
-            }
-
-            mavenCentralSync {
-                sync = true
-                user = getSonatypeUsername()
-                password = getSonatypePassword()
-                close = '1'
-                //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
-            }
-        }
-    }
-}
-
-// bintray configuration
-// bintray {
-//     user = getBintrayUserProperty()
-//     key = getBintrayApiKeyProperty()
-//     configurations = ['archives']
-//     pkg {
-//         repo = "maven"
-//         name = projectName
-//         websiteUrl = projectSiteUrl
-//         vcsUrl = projectGitUrl
-//         licenses = ["Apache-2.0"]
-//         publish = true
-//     }
-// }
