@@ -1,0 +1,211 @@
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+apply from: '../gradle/gradle-mavenlocal.gradle'
+
+//def getBintrayUserProperty() {
+//    return hasProperty('BINTRAY_USER') ? BINTRAY_USER : ""
+//}
+//
+//def getBintrayApiKeyProperty() {
+//    return hasProperty('BINTRAY_APIKEY') ? BINTRAY_APIKEY : ""
+//}
+
+// load properties
+Properties properties = new Properties()
+File localPropertiesFile = project.file("local.properties");
+if (localPropertiesFile.exists()) {
+    properties.load(localPropertiesFile.newDataInputStream())
+}
+File projectPropertiesFile = project.file("project.properties");
+if (projectPropertiesFile.exists()) {
+    properties.load(projectPropertiesFile.newDataInputStream())
+}
+
+// read properties
+def projectName = properties.getProperty("project.name")
+def projectGroupId = properties.getProperty("project.groupId")
+def projectArtifactId = properties.getProperty("project.artifactId")
+def projectVersionName = android.defaultConfig.versionName
+def projectPackaging = properties.getProperty("project.packaging")
+def projectSiteUrl = properties.getProperty("project.siteUrl")
+def projectGitUrl = properties.getProperty("project.gitUrl")
+
+def developerId = properties.getProperty("developer.id")
+def developerName = properties.getProperty("developer.name")
+def developerEmail = properties.getProperty("developer.email")
+
+def bintrayUser = properties.getProperty("bintray.user")
+def bintrayApikey = properties.getProperty("bintray.apikey")
+
+def javadocName = properties.getProperty("javadoc.name")
+
+group = projectGroupId
+
+// This generates POM.xml with proper parameters
+
+// This generates sources.jar
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+// Add compile dependencies to javadoc
+afterEvaluate {
+    javadoc.classpath += files(android.libraryVariants.collect { variant ->
+        variant.javaCompile.classpath.files
+    })
+}
+
+// This generates javadoc.jar
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+// javadoc configuration
+javadoc {
+    options {
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true
+        version projectVersionName
+        links "http://docs.oracle.com/javase/7/docs/api"
+        title javadocName
+    }
+}
+
+// gradle-mvn-push.gradle
+
+//artifacts {
+//    if (project.getPlugins().hasPlugin('com.android.application') ||
+//            project.getPlugins().hasPlugin('com.android.library')) {
+//        archives androidSourcesJar
+//        archives androidJavadocsJar
+//    } else {
+//        archives sourcesJar
+//        archives javadocJar
+//    }
+//}
+
+install {
+    repositories.mavenInstaller {
+        pom.groupId = GROUP
+        pom.artifactId = POM_ARTIFACT_ID
+        pom.version = VERSION_NAME
+
+        pom.project {
+            name POM_NAME
+            packaging POM_PACKAGING
+            description POM_DESCRIPTION
+            url POM_URL
+
+            licenses {
+                license {
+                    name POM_LICENCE_NAME
+                    url POM_LICENCE_URL
+                    distribution POM_LICENCE_DIST
+                }
+            }
+
+            developers {
+                developer {
+                    id POM_DEVELOPER_ID
+                    name POM_DEVELOPER_NAME
+                }
+            }
+
+            scm {
+                url POM_SCM_URL
+                connection POM_SCM_CONNECTION
+                developerConnection POM_SCM_DEV_CONNECTION
+            }
+        }
+    }
+}
+
+// bintray.gradle
+
+def getBintrayUser() {
+    return hasProperty('BINTRAY_USER') ? BINTRAY_USER : ""
+}
+
+def getBintrayGPGPassword() {
+    return hasProperty('BINTRAY_GPG_PASSWORD') ? BINTRAY_GPG_PASSWORD : ""
+}
+
+def getBintrayApiKey() {
+    return hasProperty('BINTRAY_API_KEY') ? BINTRAY_API_KEY : ""
+}
+
+def getSonatypeUsername() {
+    return hasProperty('SONATYPE_NEXUS_USERNAME') ? SONATYPE_NEXUS_USERNAME : ""
+}
+
+def getSonatypePassword() {
+    return hasProperty('SONATYPE_NEXUS_PASSWORD') ? SONATYPE_NEXUS_PASSWORD : ""
+}
+
+bintray {
+    user = getBintrayUser()
+    key = getBintrayApiKey()
+
+//    publish = true //[Default: false] Whether version should be auto published after an upload
+//    override = false //[Default: false] Whether to override version artifacts already published
+
+    configurations = ['archives']
+    pkg {
+        repo = "maven"
+        name = POM_NAME
+        desc = POM_DESCRIPTION
+        websiteUrl = POM_URL
+        issueTrackerUrl = POM_ISSUE_URL
+        vcsUrl = POM_SCM_URL
+        licenses = ["Apache-2.0"]
+        publish = true
+        publicDownloadNumbers = true
+
+        githubRepo = POM_URL
+        githubReleaseNotesFile = 'README.md'
+
+        version {
+            gpg {
+                sign = false // Determines whether to GPG sign the files. The default is false
+                passphrase = getBintrayGPGPassword()
+            }
+
+            mavenCentralSync {
+                sync = true
+                user = getSonatypeUsername()
+                password = getSonatypePassword()
+                close = '1'
+                //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+            }
+        }
+    }
+}
+
+// bintray configuration
+// bintray {
+//     user = getBintrayUserProperty()
+//     key = getBintrayApiKeyProperty()
+//     configurations = ['archives']
+//     pkg {
+//         repo = "maven"
+//         name = projectName
+//         websiteUrl = projectSiteUrl
+//         vcsUrl = projectGitUrl
+//         licenses = ["Apache-2.0"]
+//         publish = true
+//     }
+// }
