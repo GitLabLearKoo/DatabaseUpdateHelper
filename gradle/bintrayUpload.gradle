@@ -124,12 +124,14 @@ bintray {
     configurations = ['archives']
     pkg {
         //userOrg = bintrayOrganizationId
-        repo = projectRepositoryName
+        // repo = projectRepositoryName
+        repo = "maven"
         name = projectName
         websiteUrl = projectSiteUrl
         vcsUrl = projectGitUrl
         licenses = ["Apache-2.0"]
         publish = true
+        publicDownloadNumbers = true
         version {
             name = projectVersionName
             desc = projectVersionDesc

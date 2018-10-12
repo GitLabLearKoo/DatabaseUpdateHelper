@@ -32,4 +32,5 @@ dependencies {
     // androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2'
 }
 
-apply from: "bintrayUpload.gradle"
+// apply from: "bintrayUpload.gradle"
+apply from: rootProject.file('gradle/bintrayUpload.gradle')
