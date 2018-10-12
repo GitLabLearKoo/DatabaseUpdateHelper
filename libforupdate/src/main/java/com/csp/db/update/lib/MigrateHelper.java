@@ -10,9 +10,9 @@ import java.util.List;
 
 /**
  * 数据库升级时数据迁移帮助类
- * Github: https://github.com/jefshi/DatabaseUpdateHelper
- * Created by csp on 2018/07/07.
- * Modified by csp on 2018/07/07.
+ * <p>Github: https://github.com/jefshi/DatabaseUpdateHelper
+ * <p>Created by csp on 2018/07/07.
+ * <p>Modified by csp on 2018/07/07.
  *
  * @version 1.0.0
  */

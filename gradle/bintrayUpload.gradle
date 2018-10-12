@@ -1,103 +1,17 @@
-apply plugin: 'com.github.dcendents.android-maven'
+ apply plugin: 'com.github.dcendents.android-maven'
+//apply plugin: 'maven'
 apply plugin: 'com.jfrog.bintray'
 
- apply from: '../gradle/gradle-mavenlocal.gradle'
- apply from: '../gradle/bintray.gradle'
+// apply from: '../gradle/gradle-mavenlocal.gradle'
+apply from: '../gradle/bintray.gradle'
 
-//def getBintrayUserProperty() {
-//    return hasProperty('BINTRAY_USER') ? BINTRAY_USER : ""
-//}
-//
-//def getBintrayApiKeyProperty() {
-//    return hasProperty('BINTRAY_APIKEY') ? BINTRAY_APIKEY : ""
-//}
-
-// load properties
-Properties properties = new Properties()
-File localPropertiesFile = project.file("local.properties");
-if (localPropertiesFile.exists()) {
-    properties.load(localPropertiesFile.newDataInputStream())
-}
-File projectPropertiesFile = project.file("project.properties");
-if (projectPropertiesFile.exists()) {
-    properties.load(projectPropertiesFile.newDataInputStream())
-}
-
-// read properties
-def projectName = properties.getProperty("project.name")
-def projectGroupId = properties.getProperty("project.groupId")
-def projectArtifactId = properties.getProperty("project.artifactId")
-def projectVersionName = android.defaultConfig.versionName
-def projectPackaging = properties.getProperty("project.packaging")
-def projectSiteUrl = properties.getProperty("project.siteUrl")
-def projectGitUrl = properties.getProperty("project.gitUrl")
-
-def developerId = properties.getProperty("developer.id")
-def developerName = properties.getProperty("developer.name")
-def developerEmail = properties.getProperty("developer.email")
-
-def bintrayUser = properties.getProperty("bintray.user")
-def bintrayApikey = properties.getProperty("bintray.apikey")
-
-def javadocName = properties.getProperty("javadoc.name")
-
-group = GROUP
-
-// This generates POM.xml with proper parameters
-
-// This generates sources.jar
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-// Add compile dependencies to javadoc
-afterEvaluate {
-    javadoc.classpath += files(android.libraryVariants.collect { variant ->
-        variant.javaCompile.classpath.files
-    })
-}
-
-// This generates javadoc.jar
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
-
-// javadoc configuration
-javadoc {
-    options {
-        encoding "UTF-8"
-        charSet 'UTF-8'
-        author true
-        version VERSION_NAME
-        links "http://docs.oracle.com/javase/7/docs/api"
-        title POM_JAVADOC_TITLE
-    }
-}
-
-// gradle-mvn-push.gradle
-
-//artifacts {
-//    if (project.getPlugins().hasPlugin('com.android.application') ||
-//            project.getPlugins().hasPlugin('com.android.library')) {
-//        archives androidSourcesJar
-//        archives androidJavadocsJar
-//    } else {
-//        archives sourcesJar
-//        archives javadocJar
-//    }
-//}
+ /**
+  * 这句代码一定要加否则会出现如下错误
+  * Could not upload to 'https://api.bintray.com/content/coolcode/maven/LibUiBase/1.0.0/CommonLibrary/LibUiBase/1.0.0/LibUiBase-1.0.0.pom':
+  * HTTP/1.1 400 Bad Request [message:Unable to upload files:
+  * Maven group, artifact or version defined in the pom file do not match the file path 'CommonLibrary/LibUiBase/1.0.0/LibUiBase-1.0.0.pom']
+  */
+ group = GROUP
 
 install {
     repositories.mavenInstaller {
@@ -134,3 +48,16 @@ install {
         }
     }
 }
+
+// 9. 额外补充：
+// 保持你的library module的名字同artifactId一样
+//
+// 因为在Bintray上你的项目的maven-metadata.xml文件的路径是gruopId+"/"+module名称。
+//
+// 例如你的groupId是com.example，artifactId是test，但module名称是library。
+//
+// 这时候项目文件是在com.example.test目录下的，但maven-metadata.xml文件却是在com.example.library目录下的。
+//
+// 这样一来如果你有多个项目groupId一样，artifactId不一样，但module名称都是library的话，可能就会冲突。
+//
+// 目前为止我还没有找到更好的解决办法，就只能让module名称和artifactId保持一致，如果你们谁有更好的办法，欢迎留言交流。

@@ -16,18 +16,19 @@
 
 apply plugin: 'maven-publish'
 
-task sourceJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier "source"
-}
+// 2018-10-12
+//task sourceJar(type: Jar) {
+//    from android.sourceSets.main.java.srcDirs
+//    classifier "source"
+//}
 
 publishing {
     publications {
-        okdownload(MavenPublication) {
+        mavenLibrary(MavenPublication) {
             groupId GROUP
             artifactId POM_ARTIFACT_ID
             version VERSION_NAME
-            artifact(sourceJar)
+            artifact(sourcesJar)
             artifact("$buildDir/outputs/aar/${project.name}-release.aar")
 
             pom.withXml {

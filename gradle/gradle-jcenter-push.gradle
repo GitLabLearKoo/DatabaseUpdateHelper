@@ -34,37 +34,37 @@ publishing {
         }
     }
 }
-
-def getBintrayUserProperty() {
-    return hasProperty('BINTRAY_USER') ? BINTRAY_USER : ""
-}
-
-def getBintrayApiKeyProperty() {
-    return hasProperty('BINTRAY_APIKEY') ? BINTRAY_APIKEY : ""
-}
-
-// gradle bintrayUpload
-bintray {
-    user = getBintrayUserProperty()
-    key = getBintrayApiKeyProperty()
-    publications = ['mavenJava']
-
-    dryRun = false
-    publish = true
-    pkg {
-        repo = 'maven'
-        name = POM_ARTIFACT_ID
-        desc = POM_NAME
-        websiteUrl = POM_URL
-        issueTrackerUrl = ISSUE_URL
-        vcsUrl = GIT_URL
-        licenses = ['Apache-2.0']
-        labels = ['android', 'aar']
-        publicDownloadNumbers = true
-
-        version {
-            name = VERSION_NAME
-            vcsTag = VERSION_NAME
-        }
-    }
-}
+//
+//def getBintrayUserProperty() {
+//    return hasProperty('BINTRAY_USER') ? BINTRAY_USER : ""
+//}
+//
+//def getBintrayApiKeyProperty() {
+//    return hasProperty('BINTRAY_APIKEY') ? BINTRAY_APIKEY : ""
+//}
+//
+//// gradle bintrayUpload
+//bintray {
+//    user = getBintrayUserProperty()
+//    key = getBintrayApiKeyProperty()
+//    publications = ['mavenJava']
+//
+//    dryRun = false
+//    publish = true
+//    pkg {
+//        repo = 'maven'
+//        name = POM_ARTIFACT_ID
+//        desc = POM_NAME
+//        websiteUrl = POM_URL
+//        issueTrackerUrl = ISSUE_URL
+//        vcsUrl = GIT_URL
+//        licenses = ['Apache-2.0']
+//        labels = ['android', 'aar']
+//        publicDownloadNumbers = true
+//
+//        version {
+//            name = VERSION_NAME
+//            vcsTag = VERSION_NAME
+//        }
+//    }
+//}

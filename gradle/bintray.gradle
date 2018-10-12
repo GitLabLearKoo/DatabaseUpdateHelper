@@ -16,6 +16,7 @@
 
 apply plugin: 'com.jfrog.bintray'
 
+// 生成 source、javadoc 的 Jar
 afterEvaluate { project ->
     task sourcesJar(type: Jar) {
         from android.sourceSets.main.java.srcDirs
@@ -26,7 +27,11 @@ afterEvaluate { project ->
         failOnError false
         source = android.sourceSets.main.java.srcDirs
         options {
+            encoding "UTF-8"
             charSet = 'UTF-8'
+//            author true
+//            version VERSION_NAME
+//            title POM_JAVADOC_TITLE
             links "http://docs.oracle.com/javase/7/docs/api/"
             linksOffline "http://d.android.com/reference", System.getenv("ANDROID_HOME") + "/docs/reference"
         }
@@ -65,12 +70,14 @@ def getSonatypePassword() {
     return hasProperty('SONATYPE_NEXUS_PASSWORD') ? SONATYPE_NEXUS_PASSWORD : ""
 }
 
+version = VERSION_NAME
+
 bintray {
     user = getBintrayUser()
     key = getBintrayApiKey()
 
-//    publish = true //[Default: false] Whether version should be auto published after an upload
-//    override = false //[Default: false] Whether to override version artifacts already published
+//    publish = true // [Default: false] Whether version should be auto published after an upload
+//    override = false // [Default: false] Whether to override version artifacts already published
 
     configurations = ['archives']
     pkg {
@@ -81,6 +88,7 @@ bintray {
         issueTrackerUrl = POM_ISSUE_URL
         vcsUrl = POM_SCM_URL
         licenses = ["Apache-2.0"]
+
         publish = true
         publicDownloadNumbers = true
 
@@ -89,17 +97,17 @@ bintray {
 
         version {
             gpg {
-                sign = false // Determines whether to GPG sign the files. The default is false
+                sign = false // TODO Determines whether to GPG sign the files. The default is false
                 passphrase = getBintrayGPGPassword()
             }
 
-            mavenCentralSync {
-                sync = true
-                user = getSonatypeUsername()
-                password = getSonatypePassword()
-                close = '1'
-                //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
-            }
+            // TODO 同步到 Maven Central
+//            mavenCentralSync {
+//                sync = true
+//                user = getSonatypeUsername()
+//                password = getSonatypePassword()
+//                close = '1' // Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+//            }
         }
     }
 }
